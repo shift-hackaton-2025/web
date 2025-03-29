@@ -4,12 +4,13 @@ interface CardProps {
   title: string;
   date: string;
   imageUrl: string;
+  onClick: () => void;
 }
 
-export const Card = ({ title, date, imageUrl }: CardProps) => {
+export const Card = ({ title, date, imageUrl, onClick }: CardProps) => {
   return (
     <motion.div
-      className="relative w-[400px] h-full rounded-lg overflow-hidden flex-shrink-0 shadow-2xl"
+      className="relative w-[400px] h-full rounded-lg overflow-hidden flex-shrink-0 shadow-2xl cursor-pointer"
       style={{
         transformStyle: "preserve-3d",
         perspective: "1000px",
@@ -23,6 +24,7 @@ export const Card = ({ title, date, imageUrl }: CardProps) => {
           ease: "easeOut",
         },
       }}
+      onClick={onClick}
     >
       <div
         className="absolute inset-0 bg-cover bg-center"

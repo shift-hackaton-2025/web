@@ -1,12 +1,14 @@
 import { motion, useMotionValue } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import { Card } from "./Card";
+import { Modal } from "./Modal";
 
 interface CardData {
   id: string;
   title: string;
   date: string;
   imageUrl: string;
+  content: string;
 }
 
 interface SliderProps {
@@ -16,6 +18,7 @@ interface SliderProps {
 export const Slider = ({ cards }: SliderProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [maxScroll, setMaxScroll] = useState(0);
+  const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
   const x = useMotionValue(0);
 
   // Calculate total width needed for all cards plus padding
@@ -146,11 +149,25 @@ export const Slider = ({ cards }: SliderProps) => {
                 title={card.title}
                 date={card.date}
                 imageUrl={card.imageUrl}
+                onClick={() => setSelectedCard(card)}
               />
             </motion.div>
           ))}
         </motion.div>
       </div>
+
+      {selectedCard && (
+        <Modal
+          title={selectedCard.title}
+          date={selectedCard.date}
+          imageUrl={selectedCard.imageUrl}
+          content={selectedCard.content}
+          onAction1={() => setSelectedCard(null)}
+          onAction2={() => setSelectedCard(null)}
+          action1Text="Close"
+          action2Text="Cancel"
+        />
+      )}
     </div>
   );
 };
