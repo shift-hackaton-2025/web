@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { Settings } from "lucide-react";
+import { Settings, ChevronUp } from "lucide-react";
+import { cn } from "@/lib/utils";
+import clsx from "clsx";
 
 interface SliderItemProps {
   event: {
@@ -11,11 +13,13 @@ interface SliderItemProps {
     date: string;
     imageUrl: string;
     content: string;
+    isDone?: boolean;
   };
 }
 
 const SliderItem = ({ event }: SliderItemProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Format date to be more readable
   const formatDate = (dateString: string) => {
@@ -56,19 +60,57 @@ const SliderItem = ({ event }: SliderItemProps) => {
             onLoad={() => setImageLoaded(true)}
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-70" />
         </div>
-        {/* <div className="relative h-full flex items-end p-4 z-10">
-          <p className={`text-white text-sm transition-opacity duration-300`}>
-            {event.content}
-          </p>
-        </div> */}
-        <div className="group absolute bottom-0 left-0 right-0 flex items-start justify-center cursor-pointer">
-          <div className="w-0 h-0 border-t-[41px] border-t-transparent border-b-[0px] border-b-transparent border-r-[22px] border-r-black" />
-          <div className="py-2 bg-black w-full flex items-center justify-center">
-            <Settings className="text-white bg-black w-6 h-6 transition-transform group-hover:rotate-90 duration-300" />
+        <div
+          className={cn(
+            "absolute top-[calc(100%-40px)] left-0 right-0 flex flex-col h-full",
+            {
+              "top-0": isExpanded,
+            }
+          )}
+        >
+          <div
+            className="group flex items-start justify-center cursor-pointer"
+            {...(event.isDone && {
+              onClick: () => {
+                setIsExpanded(!isExpanded);
+              },
+            })}
+          >
+            <div
+              className={clsx(
+                "w-0 h-0 border-t-[40px] border-t-transparent border-b-[0px] border-b-transparent border-r-[22px] border-r-black opacity-60 group-hover:opacity-100 duration-300",
+                { "opacity-100": isExpanded }
+              )}
+            />
+            <div
+              className={clsx(
+                "py-2 bg-black w-full flex items-center justify-center opacity-60 group-hover:opacity-100 duration-300",
+                { "opacity-100": isExpanded }
+              )}
+            >
+              {event.isDone ? (
+                <ChevronUp className="text-white bg-black w-6 h-6 transition-transform group-hover:rotate-180  duration-300" />
+              ) : (
+                <Settings className="text-white bg-black w-6 h-6 transition-transform group-hover:rotate-90 duration-300" />
+              )}
+            </div>
+            <div
+              className={clsx(
+                "w-0 h-0 border-t-[40px] border-t-transparent border-b-[0px] border-b-transparent border-l-[22px] border-black opacity-60 group-hover:opacity-100 duration-300",
+                { "opacity-100": isExpanded }
+              )}
+            />
           </div>
-          <div className="w-0 h-0 border-t-[41px] border-t-transparent border-b-[0px] border-b-transparent border-l-[22px] border-black" />
+          {event.isDone && (
+            <div className="bg-black flex-grow p-6">
+              <p
+                className={`text-white text-base transition-opacity duration-300`}
+              >
+                {event.content}
+              </p>
+            </div>
+          )}
         </div>
       </div>
       <div className="py-4 px-2">

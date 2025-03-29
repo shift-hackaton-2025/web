@@ -8,6 +8,7 @@ export const events = [
       "The Ottoman Empire captures Constantinople, marking the end of the Byzantine Empire and the beginning of Ottoman dominance in the region.",
   },
   {
+    isDone: true,
     id: "2",
     title: "The American Declaration of Independence",
     date: "1776-07-04",
