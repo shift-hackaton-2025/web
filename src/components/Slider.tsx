@@ -2,24 +2,17 @@ import { motion, useMotionValue } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import { Card } from "./Card";
 import { Modal } from "./Modal";
-
-interface CardData {
-  id: string;
-  title: string;
-  date: string;
-  imageUrl: string;
-  content: string;
-}
+import { Event } from "@/types/events";
 
 interface SliderProps {
-  initialCards: CardData[];
+  initialCards: Event[];
 }
 
 export const Slider = ({ initialCards }: SliderProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [cards, setCards] = useState<CardData[]>(initialCards);
+  const [cards, setCards] = useState<Event[]>(initialCards);
   const [maxScroll, setMaxScroll] = useState(0);
-  const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
+  const [selectedCard, setSelectedCard] = useState<Event | null>(null);
   const x = useMotionValue(0);
 
   // Calculate total width needed for all cards plus padding
@@ -110,12 +103,12 @@ export const Slider = ({ initialCards }: SliderProps) => {
   const handleCreateNewEntry = () => {
     if (!selectedCard) return;
 
-    const newCard: CardData = {
+    const newCard: Event = {
       id: `${Date.now()}`,
-      title: "New Card",
+      title: "New Event",
       date: new Date().toISOString().split("T")[0],
-      imageUrl: selectedCard.imageUrl,
-      content: "",
+      image: selectedCard.image,
+      options: [],
     };
 
     // Find the index of the selected card
@@ -175,7 +168,7 @@ export const Slider = ({ initialCards }: SliderProps) => {
               <Card
                 title={card.title}
                 date={card.date}
-                imageUrl={card.imageUrl}
+                imageUrl={card.image}
                 onClick={() => setSelectedCard(card)}
               />
             </motion.div>
@@ -187,12 +180,14 @@ export const Slider = ({ initialCards }: SliderProps) => {
         <Modal
           title={selectedCard.title}
           date={selectedCard.date}
-          imageUrl={selectedCard.imageUrl}
-          content={selectedCard.content}
+          content={selectedCard.options
+            .map((opt) => opt.consequence)
+            .join("\n\n")}
           onClose={() => setSelectedCard(null)}
           onAction2={handleCreateNewEntry}
           action1Text="Close"
           action2Text="Create new event"
+          options={selectedCard.options}
         />
       )}
     </div>

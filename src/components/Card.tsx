@@ -8,7 +8,6 @@ interface CardProps {
 }
 
 export const Card = ({ title, date, imageUrl, onClick }: CardProps) => {
-  // Extract year from date string (YYYY-MM-DD format)
   const year = date.split("-")[0];
 
   return (
@@ -36,7 +35,10 @@ export const Card = ({ title, date, imageUrl, onClick }: CardProps) => {
           <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-blue-500 to-teal-500 transform scale-[0.80] bg-red-500 rounded-full blur-3xl" />
           <div
             className="absolute inset-0 bg-cover bg-center rounded-lg"
-            style={{ backgroundImage: `url(${imageUrl})` }}
+            // style={{ backgroundImage: `url(${imageUrl})` }}
+            style={{
+              backgroundImage: `url(https://picsum.photos/800/1200?random=1)`,
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-8 text-white">

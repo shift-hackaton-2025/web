@@ -1,9 +1,48 @@
 "use client";
 
 import { Slider } from "@/components/Slider";
-import { events } from "@/mock/events";
 import { Timeline } from "@/components/Timeline";
+import { useEffect, useState } from "react";
+import { Event } from "@/types/events";
+import { fetchInitialEvents } from "@/services/api";
+
 export default function Home() {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadEvents = async () => {
+      try {
+        const data = await fetchInitialEvents();
+        setEvents(data);
+      } catch (err) {
+        setError("Failed to load events. Please try again later.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEvents();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen w-full bg-[#0f172a] text-white flex items-center justify-center">
+        <div className="text-xl">Loading events...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen w-full bg-[#0f172a] text-white flex items-center justify-center">
+        <div className="text-xl text-red-500">{error}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen w-full bg-[#0f172a] text-white overflow-hidden relative flex items-center justify-center">
       <header className="absolute top-0 left-0 right-0 p-6 z-10">

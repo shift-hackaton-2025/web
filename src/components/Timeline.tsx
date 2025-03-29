@@ -23,11 +23,11 @@ export const Timeline = () => {
             rotateX: 0,
           },
         }}
-        className="h-[6px] w-full bg-gradient-to-br from-slate-800 to-slate-800/[0.9] relative overflow-hidden"
+        className="h-[4px] w-full bg-gradient-to-br from-slate-800 to-slate-800/[0.9] relative overflow-hidden"
       >
         {/* Two Beams that run on top of the container */}
         <Beam className="top-0" />
-        <Beam className="top-0" />
+        <Beam className="top-[2px]" />
 
         {/* A bottom gradient that looks cute */}
         <div className="z-0 ">
