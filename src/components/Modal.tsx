@@ -6,7 +6,7 @@ interface ModalProps {
   date: string;
   content: string;
   onClose: () => void;
-  onCreateNewEvent: () => void;
+  onCreateNewEvent: (optionIndex: number) => void;
   options?: Event["options"];
 }
 
@@ -22,10 +22,6 @@ export const Modal = ({
   document.body.style.overflow = "hidden";
 
   const year = date.split("-")[0];
-
-  const handleCreateNewEvent = () => {
-    onCreateNewEvent();
-  };
 
   return (
     <AnimatePresence>
@@ -60,7 +56,6 @@ export const Modal = ({
             >
               <div
                 className="absolute inset-0 bg-cover bg-center"
-                // style={{ backgroundImage: `url(${option.option_img_link})` }}
                 style={{
                   backgroundImage: `url(https://picsum.photos/800/1200?random=${index})`,
                 }}
@@ -69,7 +64,7 @@ export const Modal = ({
               <div className="absolute bottom-0 left-0 right-0 p-8">
                 <div className="flex justify-center">
                   <button
-                    onClick={handleCreateNewEvent}
+                    onClick={() => onCreateNewEvent(index)}
                     className="px-6 py-3 border rounded-lg hover:bg-white-100 transition-colors"
                   >
                     {option.title}

@@ -3,6 +3,7 @@ import { useRef, useEffect, useState } from "react";
 import { Card } from "./Card";
 import { Modal } from "./Modal";
 import { Event } from "@/types/events";
+import { updateEvents } from "@/services/api";
 
 interface SliderProps {
   initialCards: Event[];
@@ -100,33 +101,34 @@ export const Slider = ({ initialCards }: SliderProps) => {
     };
   }, [maxScroll]);
 
-  const handleCreateNewEntry = () => {
+  const onCreateNewEvent = async (optionIndex: number) => {
     if (!selectedCard) return;
 
-    const newCard: Event = {
-      id: `${Date.now()}`,
-      title: "New Event",
-      date: new Date().toISOString().split("T")[0],
-      image: selectedCard.image,
-      options: [],
-    };
+    try {
+      const optionChosen = `${selectedCard.id}_${optionIndex}`;
+      const response = await updateEvents({
+        events: cards,
+        option_chosen: optionChosen,
+        model: "gpt-4",
+        temperature: 0.7,
+      });
 
-    // Find the index of the selected card
-    const selectedIndex = cards.findIndex(
-      (card) => card.id === selectedCard.id
-    );
+      // Find the index of the current card
+      const currentCardIndex = cards.findIndex(
+        (card) => card.id === selectedCard.id
+      );
 
-    // Insert the new card after the selected card
-    setCards((prevCards) => {
-      const newCards = [...prevCards];
-      newCards.splice(selectedIndex + 1, 0, newCard);
-      return newCards;
-    });
+      // Create new cards array with:
+      // 1. All cards up to and including the current card
+      // 2. The new cards from the response
+      const newCards = [...cards.slice(0, currentCardIndex + 1), ...response];
 
-    setSelectedCard(null);
+      setCards(newCards);
+      setSelectedCard(null);
+    } catch (error) {
+      console.error("Error updating events:", error);
+    }
   };
-
-  const onCreateNewEvent = () => {};
 
   return (
     <div className="w-full h-[80vh] mx-auto">
