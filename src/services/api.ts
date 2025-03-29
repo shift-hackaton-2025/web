@@ -23,9 +23,6 @@ interface UpdateEventsPayload {
   temperature: number;
 }
 
-// index_0
-// index_1
-
 export const updateEvents = async (
   payload: UpdateEventsPayload
 ): Promise<Event[]> => {

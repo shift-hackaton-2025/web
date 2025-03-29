@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Event } from "@/types/events";
+import { useState } from "react";
 
 interface ModalProps {
   title: string;
@@ -18,10 +19,21 @@ export const Modal = ({
   onCreateNewEvent,
   options = [],
 }: ModalProps) => {
+  const [loadingIndex, setLoadingIndex] = useState<number | null>(null);
+
   // Block scroll immediately when modal mounts
   document.body.style.overflow = "hidden";
 
   const year = date.split("-")[0];
+
+  const handleCreateNewEvent = async (index: number) => {
+    setLoadingIndex(index);
+    try {
+      await onCreateNewEvent(index);
+    } finally {
+      setLoadingIndex(null);
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -57,15 +69,16 @@ export const Modal = ({
               <div
                 className="absolute inset-0 bg-cover bg-center"
                 style={{
-                  backgroundImage: `url(https://picsum.photos/800/1200?random=${index})`,
+                  backgroundImage: `url(https://uchronianh-g4bxcccwbqf8dmhe.francecentral-01.azurewebsites.net/${option.option_img_link})`,
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-8">
                 <div className="flex justify-center">
                   <button
-                    onClick={() => onCreateNewEvent(index)}
-                    className="px-6 py-3 border rounded-lg hover:bg-white-100 transition-colors"
+                    onClick={() => handleCreateNewEvent(index)}
+                    disabled={loadingIndex !== null}
+                    className="px-6 py-3 border rounded-lg hover:bg-white-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   >
                     {option.title}
                   </button>

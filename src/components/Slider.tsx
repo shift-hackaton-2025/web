@@ -131,7 +131,7 @@ export const Slider = ({ initialCards }: SliderProps) => {
   };
 
   return (
-    <div className="w-full h-[80vh] mx-auto">
+    <div className="w-screen h-screen mx-auto">
       <div
         ref={containerRef}
         className="w-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing h-full py-[70px]"
@@ -167,13 +167,12 @@ export const Slider = ({ initialCards }: SliderProps) => {
             }
           }}
         >
-          {cards.map((card, index) => (
+          {cards.map((card) => (
             <motion.div key={card.id} className="relative touch-none h-full">
               <Card
                 title={card.title}
                 date={card.date}
-                // imageUrl={card.image}
-                imageUrl={`https://picsum.photos/800/1200?random=${index}`}
+                imageUrl={`https://uchronianh-g4bxcccwbqf8dmhe.francecentral-01.azurewebsites.net/${card.image}`}
                 onClick={() => setSelectedCard(card)}
               />
             </motion.div>
