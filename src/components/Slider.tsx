@@ -126,6 +126,8 @@ export const Slider = ({ initialCards }: SliderProps) => {
     setSelectedCard(null);
   };
 
+  const onCreateNewEvent = () => {};
+
   return (
     <div className="w-full h-[80vh] mx-auto">
       <div
@@ -163,12 +165,13 @@ export const Slider = ({ initialCards }: SliderProps) => {
             }
           }}
         >
-          {cards.map((card) => (
+          {cards.map((card, index) => (
             <motion.div key={card.id} className="relative touch-none h-full">
               <Card
                 title={card.title}
                 date={card.date}
-                imageUrl={card.image}
+                // imageUrl={card.image}
+                imageUrl={`https://picsum.photos/800/1200?random=${index}`}
                 onClick={() => setSelectedCard(card)}
               />
             </motion.div>
@@ -184,9 +187,7 @@ export const Slider = ({ initialCards }: SliderProps) => {
             .map((opt) => opt.consequence)
             .join("\n\n")}
           onClose={() => setSelectedCard(null)}
-          onAction2={handleCreateNewEntry}
-          action1Text="Close"
-          action2Text="Create new event"
+          onCreateNewEvent={onCreateNewEvent}
           options={selectedCard.options}
         />
       )}

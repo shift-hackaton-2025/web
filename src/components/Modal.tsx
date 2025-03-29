@@ -6,9 +6,7 @@ interface ModalProps {
   date: string;
   content: string;
   onClose: () => void;
-  onAction2: () => void;
-  action1Text: string;
-  action2Text: string;
+  onCreateNewEvent: () => void;
   options?: Event["options"];
 }
 
@@ -17,14 +15,17 @@ export const Modal = ({
   date,
   content,
   onClose,
-  onAction2,
-  action2Text,
+  onCreateNewEvent,
   options = [],
 }: ModalProps) => {
   // Block scroll immediately when modal mounts
   document.body.style.overflow = "hidden";
 
   const year = date.split("-")[0];
+
+  const handleCreateNewEvent = () => {
+    onCreateNewEvent();
+  };
 
   return (
     <AnimatePresence>
@@ -59,20 +60,19 @@ export const Modal = ({
             >
               <div
                 className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: `url(${option.option_img_link})` }}
+                // style={{ backgroundImage: `url(${option.option_img_link})` }}
+                style={{
+                  backgroundImage: `url(https://picsum.photos/800/1200?random=${index})`,
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-8">
-                <h3 className="text-xl font-bold text-white mb-4">
-                  {option.title}
-                </h3>
-                <p className="text-white mb-4">{option.consequence}</p>
                 <div className="flex justify-center">
                   <button
-                    onClick={onAction2}
-                    className="px-6 py-3 border rounded-lg hover:bg-gray-100 transition-colors"
+                    onClick={handleCreateNewEvent}
+                    className="px-6 py-3 border rounded-lg hover:bg-white-100 transition-colors"
                   >
-                    {action2Text}
+                    {option.title}
                   </button>
                 </div>
               </div>
