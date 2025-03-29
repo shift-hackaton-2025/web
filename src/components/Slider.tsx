@@ -12,11 +12,12 @@ interface CardData {
 }
 
 interface SliderProps {
-  cards: CardData[];
+  initialCards: CardData[];
 }
 
-export const Slider = ({ cards }: SliderProps) => {
+export const Slider = ({ initialCards }: SliderProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [cards, setCards] = useState<CardData[]>(initialCards);
   const [maxScroll, setMaxScroll] = useState(0);
   const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
   const x = useMotionValue(0);
@@ -106,6 +107,32 @@ export const Slider = ({ cards }: SliderProps) => {
     };
   }, [maxScroll]);
 
+  const handleCreateNewEntry = () => {
+    if (!selectedCard) return;
+
+    const newCard: CardData = {
+      id: `${Date.now()}`,
+      title: "New Card",
+      date: new Date().toISOString().split("T")[0],
+      imageUrl: selectedCard.imageUrl,
+      content: "",
+    };
+
+    // Find the index of the selected card
+    const selectedIndex = cards.findIndex(
+      (card) => card.id === selectedCard.id
+    );
+
+    // Insert the new card after the selected card
+    setCards((prevCards) => {
+      const newCards = [...prevCards];
+      newCards.splice(selectedIndex + 1, 0, newCard);
+      return newCards;
+    });
+
+    setSelectedCard(null);
+  };
+
   return (
     <div className="w-full h-[64vh] mx-auto">
       <div
@@ -162,10 +189,10 @@ export const Slider = ({ cards }: SliderProps) => {
           date={selectedCard.date}
           imageUrl={selectedCard.imageUrl}
           content={selectedCard.content}
-          onAction1={() => setSelectedCard(null)}
-          onAction2={() => setSelectedCard(null)}
+          onClose={() => setSelectedCard(null)}
+          onAction2={handleCreateNewEntry}
           action1Text="Close"
-          action2Text="Cancel"
+          action2Text="Create new event"
         />
       )}
     </div>

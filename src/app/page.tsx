@@ -12,7 +12,7 @@ export default function Home() {
         <div className="w-full h-[4px] bg-white" />
       </div>
       <main className="w-full">
-        <Slider cards={events} />
+        <Slider initialCards={events} />
       </main>
     </div>
   );
