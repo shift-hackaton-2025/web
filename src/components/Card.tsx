@@ -5,30 +5,43 @@ interface CardProps {
   date: string;
   imageUrl: string;
   onClick: () => void;
+  disabled?: boolean;
 }
 
-export const Card = ({ title, date, imageUrl, onClick }: CardProps) => {
+export const Card = ({
+  title,
+  date,
+  imageUrl,
+  onClick,
+  disabled = false,
+}: CardProps) => {
   const year = date.split("-")[0];
 
   return (
     <div className="h-full relative">
       {/* <div className="absolute top-[212px] right-[-17px] w-[4px] h-[32px] bg-white" /> */}
       <motion.div
-        className={`flex flex-col w-[332px] h-full rounded-lgflex-shrink-0 shadow-2xl cursor-pointer`}
+        className={`flex flex-col w-[332px] h-full rounded-lgflex-shrink-0 shadow-2xl ${
+          disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+        }`}
         style={{
           transformStyle: "preserve-3d",
           perspective: "1000px",
           backfaceVisibility: "hidden",
         }}
-        whileHover={{
-          y: -10,
-          zIndex: 10,
-          transition: {
-            duration: 0.3,
-            ease: "easeOut",
-          },
-        }}
-        onClick={onClick}
+        whileHover={
+          disabled
+            ? undefined
+            : {
+                y: -10,
+                zIndex: 10,
+                transition: {
+                  duration: 0.3,
+                  ease: "easeOut",
+                },
+              }
+        }
+        onClick={disabled ? undefined : onClick}
       >
         <p className="text-lg font-bold text-white text-center pb-2">{year}</p>
         <div className="relative flex-shrink-0 shadow-2xl w-full grow">

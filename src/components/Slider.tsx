@@ -118,10 +118,22 @@ export const Slider = ({ initialCards }: SliderProps) => {
         (card) => card.id === selectedCard.id
       );
 
+      // Update the selected card's image with the chosen option's image
+      const updatedCards = [...cards];
+      updatedCards[currentCardIndex] = {
+        ...updatedCards[currentCardIndex],
+        image: selectedCard.options[optionIndex].option_img_link,
+        title: selectedCard.options[optionIndex].title,
+        disabled: true,
+      };
+
       // Create new cards array with:
-      // 1. All cards up to and including the current card
+      // 1. All cards up to and including the current card (with updated image)
       // 2. The new cards from the response
-      const newCards = [...cards.slice(0, currentCardIndex + 1), ...response];
+      const newCards = [
+        ...updatedCards.slice(0, currentCardIndex + 1),
+        ...response,
+      ];
 
       setCards(newCards);
       setSelectedCard(null);
@@ -174,6 +186,7 @@ export const Slider = ({ initialCards }: SliderProps) => {
                 date={card.date}
                 imageUrl={`https://uchronianh-g4bxcccwbqf8dmhe.francecentral-01.azurewebsites.net/${card.image}`}
                 onClick={() => setSelectedCard(card)}
+                disabled={card.disabled}
               />
             </motion.div>
           ))}

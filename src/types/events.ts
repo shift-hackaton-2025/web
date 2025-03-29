@@ -11,6 +11,7 @@ export interface Event {
   image: string;
   date: string;
   options: Option[];
+  disabled?: boolean;
 }
 
 export type Events = Event[];

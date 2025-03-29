@@ -16,7 +16,10 @@ export default function Home() {
     const loadEvents = async () => {
       try {
         const data = await fetchInitialEvents();
-        setEvents(data);
+        const sortedEvents = [...data].sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
+        setEvents(sortedEvents);
       } catch (err) {
         setError("Failed to load events. Please try again later.");
         console.error(err);
