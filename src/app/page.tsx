@@ -20,7 +20,7 @@ function LoadingFallback() {
 
 export default function Home() {
   return (
-    <main className="min-h-screen w-full">
+    <main className="min-h-screen w-full bg-[#F5F5F5]">
       <Suspense fallback={<LoadingFallback />}>
         <EventsLoader />
       </Suspense>

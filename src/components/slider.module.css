@@ -11,8 +11,7 @@
 .slider {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: 342px;
-  gap: 24px;
+  grid-auto-columns: 350px;
   height: 100%;
 }
 
