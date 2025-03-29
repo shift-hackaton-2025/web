@@ -8,9 +8,12 @@ interface CardProps {
 }
 
 export const Card = ({ title, date, imageUrl, onClick }: CardProps) => {
+  // Extract year from date string (YYYY-MM-DD format)
+  const year = date.split("-")[0];
+
   return (
     <motion.div
-      className="relative w-[400px] h-full rounded-lg overflow-hidden flex-shrink-0 shadow-2xl cursor-pointer"
+      className={`relative w-[332px] h-full rounded-lg overflow-hidden flex-shrink-0 shadow-2xl cursor-pointer`}
       style={{
         transformStyle: "preserve-3d",
         perspective: "1000px",
@@ -32,8 +35,8 @@ export const Card = ({ title, date, imageUrl, onClick }: CardProps) => {
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-        <h2 className="text-3xl font-bold mb-3">{title}</h2>
-        <p className="text-lg opacity-80">{date}</p>
+        <p className="text-lg opacity-80">{year}</p>
+        <h2 className="text-xl font-bold mb-3">{title}</h2>
       </div>
     </motion.div>
   );
