@@ -134,10 +134,10 @@ export const Slider = ({ initialCards }: SliderProps) => {
   };
 
   return (
-    <div className="w-full h-[64vh] mx-auto">
+    <div className="w-full h-[80vh] mx-auto">
       <div
         ref={containerRef}
-        className="w-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing h-full pt-2.5"
+        className="w-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing h-full py-[70px]"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         <motion.div

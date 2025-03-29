@@ -13,9 +13,9 @@ export const Card = ({ title, date, imageUrl, onClick }: CardProps) => {
 
   return (
     <div className="h-full relative">
-      <div className="absolute top-[212px] right-[-17px] w-[4px] h-[32px] bg-white" />
+      {/* <div className="absolute top-[212px] right-[-17px] w-[4px] h-[32px] bg-white" /> */}
       <motion.div
-        className={`flex flex-col w-[332px] h-full rounded-lg overflow-hidden flex-shrink-0 shadow-2xl cursor-pointer`}
+        className={`flex flex-col w-[332px] h-full rounded-lgflex-shrink-0 shadow-2xl cursor-pointer`}
         style={{
           transformStyle: "preserve-3d",
           perspective: "1000px",
@@ -32,9 +32,10 @@ export const Card = ({ title, date, imageUrl, onClick }: CardProps) => {
         onClick={onClick}
       >
         <p className="text-lg font-bold text-white text-center pb-2">{year}</p>
-        <div className="relative rounded-lg overflow-hidden flex-shrink-0 shadow-2xl w-full grow">
+        <div className="relative flex-shrink-0 shadow-2xl w-full grow">
+          <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-blue-500 to-teal-500 transform scale-[0.80] bg-red-500 rounded-full blur-3xl" />
           <div
-            className="absolute inset-0 bg-cover bg-center"
+            className="absolute inset-0 bg-cover bg-center rounded-lg"
             style={{ backgroundImage: `url(${imageUrl})` }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
