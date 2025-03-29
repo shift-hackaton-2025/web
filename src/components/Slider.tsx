@@ -109,7 +109,7 @@ export const Slider = ({ initialCards }: SliderProps) => {
       const response = await updateEvents({
         events: cards,
         option_chosen: optionChosen,
-        model: "gpt-4",
+        model: "gpt-4o",
         temperature: 0.7,
       });
 

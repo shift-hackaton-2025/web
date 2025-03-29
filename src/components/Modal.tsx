@@ -20,6 +20,7 @@ export const Modal = ({
   options = [],
 }: ModalProps) => {
   const [loadingIndex, setLoadingIndex] = useState<number | null>(null);
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
 
   // Block scroll immediately when modal mounts
   document.body.style.overflow = "hidden";
@@ -28,6 +29,7 @@ export const Modal = ({
 
   const handleCreateNewEvent = async (index: number) => {
     setLoadingIndex(index);
+    setSelectedOption(index);
     try {
       await onCreateNewEvent(index);
     } finally {
@@ -74,14 +76,38 @@ export const Modal = ({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-8">
-                <div className="flex justify-center">
+                <div className="flex flex-col items-center gap-4">
                   <button
                     onClick={() => handleCreateNewEvent(index)}
-                    disabled={loadingIndex !== null}
-                    className="px-6 py-3 border rounded-lg hover:bg-white-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    disabled={loadingIndex !== null || selectedOption !== null}
+                    className="px-6 py-3 border rounded-lg hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-white"
                   >
-                    {option.title}
+                    {loadingIndex === index ? (
+                      <>
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }}
+                          className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                        />
+                        <span>Chargement...</span>
+                      </>
+                    ) : (
+                      option.title
+                    )}
                   </button>
+                  {selectedOption === index && (
+                    <motion.p
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-white/80 text-sm text-center max-w-[80%]"
+                    >
+                      {option.consequence}
+                    </motion.p>
+                  )}
                 </div>
               </div>
             </div>

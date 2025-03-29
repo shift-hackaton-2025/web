@@ -22,7 +22,7 @@ export const Card = ({
       {/* <div className="absolute top-[212px] right-[-17px] w-[4px] h-[32px] bg-white" /> */}
       <motion.div
         className={`flex flex-col w-[332px] h-full rounded-lgflex-shrink-0 shadow-2xl ${
-          disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+          disabled ? "cursor-not-allowed" : "cursor-pointer"
         }`}
         style={{
           transformStyle: "preserve-3d",
