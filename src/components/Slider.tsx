@@ -1,210 +1,130 @@
-import { motion, useMotionValue } from "framer-motion";
-import { useRef, useEffect, useState } from "react";
-import { Card } from "./Card";
-import { Modal } from "./Modal";
-import { Event } from "@/types/events";
-import { updateEvents } from "@/services/api";
+"use client";
 
-interface SliderProps {
-  initialCards: Event[];
-}
+import { useRef, useState, useEffect } from "react";
+import { events } from "@/mock/events";
+import SliderItem from "./SliderItem";
+import styles from "./slider.module.css";
 
-export const Slider = ({ initialCards }: SliderProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [cards, setCards] = useState<Event[]>(initialCards);
-  const [maxScroll, setMaxScroll] = useState(0);
-  const [selectedCard, setSelectedCard] = useState<Event | null>(null);
-  const x = useMotionValue(0);
+export const Slider = () => {
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [startY, setStartY] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [scrollTop, setScrollTop] = useState(0);
 
-  // Calculate total width needed for all cards plus padding
-  const cardWidth = 332; // Width of each card
-  const cardGap = 32; // Gap between cards
+  // Handle mouse down event for dragging
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setStartX(e.pageX - (sliderRef.current?.offsetLeft || 0));
+    setStartY(e.pageY - (sliderRef.current?.offsetTop || 0));
+    setScrollLeft(sliderRef.current?.scrollLeft || 0);
+    setScrollTop(sliderRef.current?.scrollTop || 0);
+  };
 
-  // Total width calculation - we only need one side padding since the container already has padding
-  const totalWidth = cards.length * (cardWidth + cardGap) + cardGap;
+  // Handle mouse move event for dragging
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging) return;
+    e.preventDefault();
 
-  // Update x when scrolling
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    if (sliderRef.current) {
+      const x = e.pageX - (sliderRef.current.offsetLeft || 0);
+      const y = e.pageY - (sliderRef.current.offsetTop || 0);
+      const walkX = (x - startX) * 2; // Multiply for faster scrolling
+      const walkY = (y - startY) * 2;
 
-    const handleScroll = () => {
-      x.set(-container.scrollLeft);
-    };
-
-    container.addEventListener("scroll", handleScroll);
-    return () => container.removeEventListener("scroll", handleScroll);
-  }, [x]);
-
-  // Update scroll when x changes
-  useEffect(() => {
-    const unsubscribe = x.on("change", (latest) => {
-      if (containerRef.current) {
-        containerRef.current.scrollLeft = -latest;
-      }
-    });
-    return () => unsubscribe();
-  }, [x]);
-
-  useEffect(() => {
-    if (containerRef.current) {
-      const updateSizes = () => {
-        const container = containerRef.current;
-        if (container) {
-          const adjustedMaxScroll = Math.max(
-            0,
-            totalWidth - container.clientWidth + cardGap
-          );
-          setMaxScroll(adjustedMaxScroll);
-        }
-      };
-
-      updateSizes();
-      window.addEventListener("resize", updateSizes);
-      return () => window.removeEventListener("resize", updateSizes);
-    }
-  }, [cards, totalWidth, cardGap]);
-
-  useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      if (containerRef.current) {
-        const container = containerRef.current;
-
-        if (maxScroll <= 0) {
-          e.preventDefault();
-          return;
-        }
-
-        if (
-          (container.scrollLeft > 0 && container.scrollLeft < maxScroll) ||
-          (container.scrollLeft === 0 && e.deltaY > 0) ||
-          (container.scrollLeft === maxScroll && e.deltaY < 0)
-        ) {
-          e.preventDefault();
-        }
-
-        const newScrollLeft = container.scrollLeft + e.deltaY;
-        const clampedScroll = Math.max(0, Math.min(newScrollLeft, maxScroll));
-        container.scrollLeft = clampedScroll;
-      }
-    };
-
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener("wheel", handleWheel, { passive: false });
-    }
-
-    return () => {
-      if (container) {
-        container.removeEventListener("wheel", handleWheel);
-      }
-    };
-  }, [maxScroll]);
-
-  const onCreateNewEvent = async (optionIndex: number) => {
-    if (!selectedCard) return;
-
-    try {
-      const optionChosen = `${selectedCard.id}_${optionIndex}`;
-      const response = await updateEvents({
-        events: cards,
-        option_chosen: optionChosen,
-        model: "gpt-4o",
-        temperature: 0.7,
-      });
-
-      // Find the index of the current card
-      const currentCardIndex = cards.findIndex(
-        (card) => card.id === selectedCard.id
-      );
-
-      // Update the selected card's image with the chosen option's image
-      const updatedCards = [...cards];
-      updatedCards[currentCardIndex] = {
-        ...updatedCards[currentCardIndex],
-        image: selectedCard.options[optionIndex].option_img_link,
-        title: selectedCard.options[optionIndex].title,
-        disabled: true,
-      };
-
-      // Create new cards array with:
-      // 1. All cards up to and including the current card (with updated image)
-      // 2. The new cards from the response
-      const newCards = [
-        ...updatedCards.slice(0, currentCardIndex + 1),
-        ...response,
-      ];
-
-      setCards(newCards);
-      setSelectedCard(null);
-    } catch (error) {
-      console.error("Error updating events:", error);
+      sliderRef.current.scrollLeft = scrollLeft - walkX;
+      sliderRef.current.scrollTop = scrollTop - walkY;
     }
   };
 
-  return (
-    <div className="w-screen h-screen mx-auto">
-      <div
-        ref={containerRef}
-        className="w-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing h-full py-[70px]"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-      >
-        <motion.div
-          className="flex gap-8 px-8 h-full relative items-center"
-          style={{
-            width: `${totalWidth}px`,
-            x,
-          }}
-          drag="x"
-          dragConstraints={{
-            left: -maxScroll,
-            right: 0,
-          }}
-          dragElastic={0}
-          dragMomentum={false}
-          onDragStart={() => {
-            if (containerRef.current) {
-              containerRef.current.style.overflowX = "hidden";
-            }
-          }}
-          onDragEnd={() => {
-            if (containerRef.current) {
-              containerRef.current.style.overflowX = "auto";
-              const currentX = x.get();
-              if (currentX > 0) {
-                x.set(0);
-              } else if (currentX < -maxScroll) {
-                x.set(-maxScroll);
-              }
-            }
-          }}
-        >
-          {cards.map((card) => (
-            <motion.div key={card.id} className="relative touch-none h-full">
-              <Card
-                title={card.title}
-                date={card.date}
-                imageUrl={`https://uchronianh-g4bxcccwbqf8dmhe.francecentral-01.azurewebsites.net/${card.image}`}
-                onClick={() => setSelectedCard(card)}
-                disabled={card.disabled}
-              />
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
+  // Handle mouse up event for dragging
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
 
-      {selectedCard && (
-        <Modal
-          title={selectedCard.title}
-          date={selectedCard.date}
-          content={selectedCard.options
-            .map((opt) => opt.consequence)
-            .join("\n\n")}
-          onClose={() => setSelectedCard(null)}
-          onCreateNewEvent={onCreateNewEvent}
-          options={selectedCard.options}
-        />
-      )}
+  // Handle wheel event to transform both vertical and horizontal scroll to slider movement
+  const handleWheel = (e: WheelEvent) => {
+    e.preventDefault();
+
+    if (sliderRef.current) {
+      // Convert both vertical (deltaY) and horizontal (deltaX) scroll to horizontal movement
+      sliderRef.current.scrollLeft += e.deltaY + e.deltaX;
+    }
+  };
+
+  // Touch event handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      setIsDragging(true);
+      setStartX(e.touches[0].clientX - (sliderRef.current?.offsetLeft || 0));
+      setStartY(e.touches[0].clientY - (sliderRef.current?.offsetTop || 0));
+      setScrollLeft(sliderRef.current?.scrollLeft || 0);
+      setScrollTop(sliderRef.current?.scrollTop || 0);
+    }
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    if (!isDragging || e.touches.length !== 1) return;
+
+    if (sliderRef.current) {
+      const x = e.touches[0].clientX - (sliderRef.current.offsetLeft || 0);
+      const y = e.touches[0].clientY - (sliderRef.current.offsetTop || 0);
+      const walkX = (x - startX) * 1.5;
+      const walkY = (y - startY) * 1.5;
+
+      sliderRef.current.scrollLeft = scrollLeft - walkX;
+      sliderRef.current.scrollTop = scrollTop - walkY;
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
+  // Add and remove event listeners
+  useEffect(() => {
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener(
+      "touchmove",
+      handleTouchMove as unknown as EventListener,
+      { passive: false }
+    );
+    document.addEventListener("touchend", handleTouchEnd);
+
+    // Add wheel event listener to enable vertical scroll to horizontal conversion
+    document.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener(
+        "touchmove",
+        handleTouchMove as unknown as EventListener
+      );
+      document.removeEventListener("touchend", handleTouchEnd);
+      document.removeEventListener("wheel", handleWheel);
+    };
+  }, [isDragging, startX, startY, scrollLeft, scrollTop]);
+
+  return (
+    <div className={styles.sliderWrapper}>
+      <div
+        ref={sliderRef}
+        className={`${styles.slider} ${styles.scrollContainer} ${
+          isDragging ? "cursor-grabbing" : "cursor-grab"
+        }`}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
+        style={{
+          overscrollBehavior: "contain",
+        }}
+      >
+        {events.map((event) => (
+          <SliderItem key={event.id} event={event} />
+        ))}
+      </div>
     </div>
   );
 };
