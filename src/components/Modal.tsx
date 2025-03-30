@@ -41,17 +41,6 @@ export const Modal = ({
     }
   };
 
-  console.log("music_file: ", music_file);
-  console.log(
-    "options[selectedOption]: ",
-    typeof selectedOption === "number" && options[selectedOption].music_file
-  );
-
-  console.log(
-    "getImagePath: ",
-    selectedOption && getImagePath(options[selectedOption].img)
-  );
-
   return (
     <AnimatePresence>
       <motion.div
@@ -93,9 +82,7 @@ export const Modal = ({
                   </button>
                   <p className="pt-6 text-2xl font-bold mb-2">{year}</p>
                   <h2 className="text-4xl font-bold mb-6">{title}</h2>
-                  <div className="prose prose-lg">
-                    <p>{content}</p>
-                  </div>
+                  <p className="prose prose-lg">{content}</p>
                 </div>
               </div>
               {options.map((option, index) => (
@@ -114,14 +101,14 @@ export const Modal = ({
                     <div className="flex flex-col items-center gap-4">
                       <div className="py-4 px-2">
                         <div className="flex items-center justify-center transform transition hover:-translate-y-1 ">
-                          <div className="w-0 h-0 border-t-[34px] border-t-transparent border-b-[36px] border-b-transparent border-r-[22px] border-r-white" />
+                          <div className="w-0 h-0 border-t-[37px] border-t-transparent border-b-[36px] border-b-transparent border-r-[22px] border-r-white" />
                           <button
                             onClick={() => handleCreateNewEvent(index)}
                             className="min-h-[72px] text-l font-bold text-black bg-white text-center px-9 py-5.5 line-clamp-2 overflow-hidden cursor-pointer"
                           >
                             {option.title}
                           </button>
-                          <div className="w-0 h-0 border-t-[34px] border-t-transparent border-b-[36px] border-b-transparent border-l-[22px] border-white" />
+                          <div className="w-0 h-0 border-t-[37px] border-t-transparent border-b-[36px] border-b-transparent border-l-[22px] border-white" />
                         </div>
                       </div>
                     </div>
@@ -148,7 +135,7 @@ export const Modal = ({
                       }}
                     >
                       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent" />
-                      <div className="absolute bottom-[12%] left-0 right-0 p-8 text-white/90 text-xl max-w-[50%] mx-auto">
+                      <div className="absolute bottom-[8%] left-0 right-0 p-8 text-white/90 text-xl max-w-[50%] mx-auto">
                         <p className="pt-6 text-3xl font-bold mb-2">{year}</p>
                         <h2 className="text-4xl font-bold mb-6">
                           {options[selectedOption].title}

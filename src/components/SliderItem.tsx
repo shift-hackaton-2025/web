@@ -27,7 +27,6 @@ const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
   const [isPolling, setIsPolling] = useState(false);
 
   useEffect(() => {
-    console.log("task_id: ", imageTask?.task_id);
     let intervalId: NodeJS.Timeout;
 
     const pollImageStatus = async () => {
@@ -85,8 +84,6 @@ const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
     }
   };
 
-  const image = imageUrl ? getImagePath(imageUrl) : getImagePath(event.image);
-
   return (
     <div
       className="flex flex-col h-full w-[350px] rounded-lg overflow-hidden transition-transform duration-300 ease-in-out py-4 px-1"
@@ -111,7 +108,9 @@ const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
           {(event.image || imageUrl) && (
             <Image
               key={imageUrl || event.image}
-              src={image}
+              src={
+                imageUrl ? getImagePath(imageUrl) : getImagePath(event.image)
+              }
               alt={event.title}
               fill
               sizes="342px"
@@ -122,7 +121,9 @@ const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
             />
           )}
         </div>
-        {image.includes("amazonaws.com") && (
+        {(imageUrl
+          ? imageUrl?.includes("amazonaws.com")
+          : event.image.includes("amazonaws.com")) && (
           <div className="absolute top-0 left-0 w-full h-full bg-background/20 backdrop-blur supports-[backdrop-filter]:bg-background/20" />
         )}
         <div

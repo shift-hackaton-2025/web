@@ -205,6 +205,7 @@ export const Slider = ({ events }: { events: Event[] }) => {
         ...updatedCards[currentCardIndex],
         title: selectedCard.options[optionIndex].title,
         image: selectedCard.options[optionIndex].img,
+        description: selectedCard.options[optionIndex].consequence,
         isDone: true,
       };
 
@@ -230,8 +231,6 @@ export const Slider = ({ events }: { events: Event[] }) => {
     }
   };
 
-  console.log("imageTasks: ", imageTasks);
-
   return (
     <>
       <div className={styles.sliderWrapper}>
@@ -251,8 +250,6 @@ export const Slider = ({ events }: { events: Event[] }) => {
               key={card.id}
               event={card}
               imageTask={imageTasks.find((task) => {
-                console.log("task.event_id: ", task.event_id);
-                console.log("card.id: ", card.id);
                 return task.event_id === card.id;
               })}
               onClick={() => {
