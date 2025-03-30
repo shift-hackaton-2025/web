@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Event } from "@/types/events";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface ModalProps {
   title: string;
@@ -9,6 +10,7 @@ interface ModalProps {
   onClose: () => void;
   onCreateNewEvent: (optionIndex: number) => void;
   options?: Event["options"];
+  music_file?: string;
 }
 
 export const Modal = ({
@@ -18,6 +20,7 @@ export const Modal = ({
   onClose,
   onCreateNewEvent,
   options = [],
+  music_file,
 }: ModalProps) => {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isSecondView, setIsSecondView] = useState(false);
@@ -37,6 +40,12 @@ export const Modal = ({
     }
   };
 
+  console.log("music_file: ", music_file);
+  console.log(
+    "options[selectedOption]: ",
+    typeof selectedOption === "number" && options[selectedOption].music_file
+  );
+
   return (
     <AnimatePresence>
       <motion.div
@@ -45,6 +54,20 @@ export const Modal = ({
         exit={{ opacity: 0 }}
         className="fixed inset-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50"
       >
+        {music_file && !selectedOption && (
+          <audio autoPlay loop>
+            <source src={`/music/${music_file}`} type="audio/mpeg" />
+          </audio>
+        )}
+        {typeof selectedOption === "number" &&
+          options[selectedOption].music_file && (
+            <audio autoPlay loop>
+              <source
+                src={`/music/${options[selectedOption].music_file}`}
+                type="audio/mpeg"
+              />
+            </audio>
+          )}
         <div className="flex h-full overflow-hidden">
           <AnimatePresence>
             <motion.div
@@ -77,7 +100,7 @@ export const Modal = ({
                   <div
                     className="absolute inset-0 bg-cover bg-center"
                     style={{
-                      backgroundImage: `url(https://uchronianh-g4bxcccwbqf8dmhe.francecentral-01.azurewebsites.net/${option.img})`,
+                      backgroundImage: `url(https://uchronia-backend.deploymate.xyz/${option.img})`,
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
@@ -113,7 +136,7 @@ export const Modal = ({
                     <div
                       className="flex-1 bg-cover bg-center relative"
                       style={{
-                        backgroundImage: `url(https://uchronianh-g4bxcccwbqf8dmhe.francecentral-01.azurewebsites.net/${options[selectedOption].img})`,
+                        backgroundImage: `url(https://uchronia-backend.deploymate.xyz/${options[selectedOption].img})`,
                       }}
                     >
                       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
@@ -127,10 +150,13 @@ export const Modal = ({
                         </p>
                         <button
                           {...(!loading && { onClick: onClose })}
-                          className="text-white border border-white rounded-full px-6 py-2 transition-colors cursor-pointer text-base hover:bg-white hover:text-black"
+                          className={cn(
+                            "text-white border border-white rounded-full px-6 py-2 transition-colors cursor-pointer text-basehover:text-black",
+                            { "hover:bg-white": !loading }
+                          )}
                         >
                           {loading
-                            ? "Chargement du multivers..."
+                            ? "Chargement du multivers en cours..."
                             : "Voir les répercussions"}
                         </button>
                       </div>

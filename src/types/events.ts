@@ -3,6 +3,7 @@ export interface Option {
   img: string;
   consequence: string;
   consequence_img_link: string;
+  music_file: string;
 }
 
 export interface Event {
@@ -13,6 +14,7 @@ export interface Event {
   description: string;
   options: Option[];
   isDone?: boolean;
+  music_file: string;
 }
 
 export type Events = Event[];

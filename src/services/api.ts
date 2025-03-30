@@ -1,7 +1,6 @@
 import { Event } from "@/types/events";
 
-const API_URL =
-  "https://uchronianh-g4bxcccwbqf8dmhe.francecentral-01.azurewebsites.net";
+const API_URL = "https://uchronia-backend.deploymate.xyz";
 
 export const fetchInitialEvents = async (): Promise<Event[]> => {
   try {

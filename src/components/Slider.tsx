@@ -150,14 +150,7 @@ export const Slider = ({ events }: { events: Event[] }) => {
         ...response.events,
       ];
 
-      console.log("newCards: ", newCards);
-      console.log("response.image_tasks: ", response.image_tasks);
-
       setCards(newCards);
-      console.log(
-        "setImageTasks: ",
-        response.image_tasks.filter((task) => task.event_id !== selectedCard.id)
-      );
       setImageTasks(
         response.image_tasks.filter((task) => task.event_id !== selectedCard.id)
       );
@@ -202,6 +195,7 @@ export const Slider = ({ events }: { events: Event[] }) => {
           onClose={() => setSelectedCard(null)}
           onCreateNewEvent={onCreateNewEvent}
           options={selectedCard.options}
+          music_file={selectedCard.music_file}
         />
       )}
     </>

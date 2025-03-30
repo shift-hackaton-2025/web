@@ -4,8 +4,7 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        hostname:
-          "uchronianh-g4bxcccwbqf8dmhe.francecentral-01.azurewebsites.net",
+        hostname: "uchronia-backend.deploymate.xyz",
       },
     ],
   },

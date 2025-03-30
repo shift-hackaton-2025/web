@@ -35,7 +35,7 @@ const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
 
       try {
         const response = await fetch(
-          `https://uchronianh-g4bxcccwbqf8dmhe.francecentral-01.azurewebsites.net/image-status/${imageTask.task_id}`
+          `https://uchronia-backend.deploymate.xyz/image-status/${imageTask.task_id}`
         );
         const data = await response.json();
 
@@ -56,7 +56,7 @@ const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
       pollImageStatus();
 
       // Set up polling interval (every 5 seconds)
-      intervalId = setInterval(pollImageStatus, 5000);
+      intervalId = setInterval(pollImageStatus, 10000);
     }
 
     // Clean up interval on component unmount
@@ -76,6 +76,8 @@ const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
       return dateString; // Fallback to the original string if parsing fails
     }
   };
+
+  console.log("imageUrl: ", imageUrl);
 
   return (
     <div
@@ -100,11 +102,11 @@ const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
         >
           {(event.image || imageUrl) && (
             <Image
-              key={event.image || imageUrl}
+              key={imageUrl || event.image}
               src={
-                event.image
-                  ? `https://uchronianh-g4bxcccwbqf8dmhe.francecentral-01.azurewebsites.net/${event.image}`
-                  : `https://uchronianh-g4bxcccwbqf8dmhe.francecentral-01.azurewebsites.net/${imageUrl}`
+                imageUrl
+                  ? `https://uchronia-backend.deploymate.xyz${imageUrl}`
+                  : `https://uchronia-backend.deploymate.xyz/${event.image}`
               }
               alt={event.title}
               fill
@@ -112,6 +114,7 @@ const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
               className="object-cover transition-transform duration-500 ease-in-out"
               onLoad={() => setImageLoaded(true)}
               loading="lazy"
+              unoptimized
             />
           )}
         </div>
