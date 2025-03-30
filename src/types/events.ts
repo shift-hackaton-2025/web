@@ -10,7 +10,7 @@ export interface Event {
   title: string;
   image: string;
   date: string;
-  content: string;
+  description: string;
   options: Option[];
   disabled?: boolean;
   isDone?: boolean;

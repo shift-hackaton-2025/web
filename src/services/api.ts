@@ -25,7 +25,12 @@ interface UpdateEventsPayload {
 
 export const updateEvents = async (
   payload: UpdateEventsPayload
-): Promise<Event[]> => {
+): Promise<{
+  events: Event[];
+  image_tasks: {
+    additionalProp1: string;
+  }[];
+}> => {
   try {
     const response = await fetch(`${API_URL}/update_events`, {
       method: "POST",
@@ -34,6 +39,8 @@ export const updateEvents = async (
       },
       body: JSON.stringify(payload),
     });
+
+    console.log(response);
 
     if (!response.ok) {
       throw new Error("Failed to update events");

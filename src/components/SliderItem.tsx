@@ -105,7 +105,7 @@ const SliderItem = ({ event, onClick }: SliderItemProps) => {
               <p
                 className={`text-white text-base transition-opacity duration-300`}
               >
-                {event.content}
+                {event.description}
               </p>
             </div>
           )}

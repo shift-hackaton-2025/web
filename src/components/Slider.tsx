@@ -9,6 +9,11 @@ import { updateEvents } from "@/services/api";
 
 export const Slider = ({ events }: { events: Event[] }) => {
   const [selectedCard, setSelectedCard] = useState<Event | null>(null);
+  const [imageTasks, setImageTasks] = useState<
+    {
+      additionalProp1: string;
+    }[]
+  >([]);
   const [cards, setCards] = useState<Event[]>(events);
 
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -140,10 +145,11 @@ export const Slider = ({ events }: { events: Event[] }) => {
 
       const newCards = [
         ...updatedCards.slice(0, currentCardIndex + 1),
-        ...response,
+        ...response.events,
       ];
 
       setCards(newCards);
+      setImageTasks(response.image_tasks);
       setSelectedCard(null);
     } catch (error) {
       console.error("Error updating events:", error);
@@ -179,7 +185,7 @@ export const Slider = ({ events }: { events: Event[] }) => {
         <Modal
           title={selectedCard.title}
           date={selectedCard.date}
-          content={selectedCard.content}
+          content={selectedCard.description}
           onClose={() => setSelectedCard(null)}
           onCreateNewEvent={onCreateNewEvent}
           options={selectedCard.options}
