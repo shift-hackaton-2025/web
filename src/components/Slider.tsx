@@ -145,14 +145,18 @@ export const Slider = ({ events }: { events: Event[] }) => {
         isDone: true,
       };
 
-      console.log("response.events: ", response.events);
+      // Set isDisabled to true for all cards before the selected card
+      for (let i = 0; i < currentCardIndex; i++) {
+        updatedCards[i] = {
+          ...updatedCards[i],
+          isDisabled: true,
+        };
+      }
 
       const newCards = [
         ...updatedCards.slice(0, currentCardIndex + 1),
         ...response.events,
       ];
-
-      console.log("newCards: ", newCards);
 
       setCards(newCards);
       setImageTasks(

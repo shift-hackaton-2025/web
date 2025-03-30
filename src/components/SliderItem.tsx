@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Settings, ChevronUp } from "lucide-react";
+import { Settings, ChevronUp, LockIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import clsx from "clsx";
 import { Event } from "@/types/events";
@@ -134,8 +134,10 @@ const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
           )}
         >
           <div
-            className="group flex items-start justify-center cursor-pointer"
-            {...(event.isDone && {
+            className={clsx("group flex items-start justify-center", {
+              "cursor-pointer": !event.isDisabled,
+            })}
+            {...((event.isDone || event.isDisabled) && {
               onClick: () => {
                 setIsExpanded(!isExpanded);
               },
@@ -143,38 +145,50 @@ const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
           >
             <div
               className={clsx(
-                "w-0 h-0 border-t-[40px] border-t-transparent border-b-[0px] border-b-transparent border-r-[22px] border-r-black opacity-60 group-hover:opacity-100 duration-300",
-                { "opacity-100": isExpanded }
+                "w-0 h-0 border-t-[40px] border-t-transparent border-b-[0px] border-b-transparent border-r-[22px] border-r-black opacity-60 duration-300",
+                {
+                  "opacity-100": isExpanded,
+                  "group-hover:opacity-100": !event.isDisabled,
+                }
               )}
             />
             <div
               className={clsx(
-                "py-2 bg-black w-full flex items-center justify-center opacity-60 group-hover:opacity-100 duration-300",
-                { "opacity-100": isExpanded }
+                "py-2 bg-black w-full flex items-center justify-center opacity-60  duration-300",
+                {
+                  "opacity-100": isExpanded,
+                  "group-hover:opacity-100": !event.isDisabled,
+                }
               )}
             >
               {event.isDone ? (
-                <ChevronUp className="text-white bg-black w-6 h-6 transition-transform group-hover:rotate-180  duration-300" />
+                <ChevronUp className="text-white bg-black w-6 h-6 transition-transform group-hover:rotate-180 duration-300" />
+              ) : event.isDisabled ? (
+                <LockIcon className="text-white bg-black w-6 h-6" />
               ) : (
                 <Settings className="text-white bg-black w-6 h-6 transition-transform group-hover:rotate-90 duration-300" />
               )}
             </div>
             <div
               className={clsx(
-                "w-0 h-0 border-t-[40px] border-t-transparent border-b-[0px] border-b-transparent border-l-[22px] border-black opacity-60 group-hover:opacity-100 duration-300",
-                { "opacity-100": isExpanded }
+                "w-0 h-0 border-t-[40px] border-t-transparent border-b-[0px] border-b-transparent border-l-[22px] border-black opacity-60 duration-300",
+                {
+                  "opacity-100": isExpanded,
+                  "group-hover:opacity-100": !event.isDisabled,
+                }
               )}
             />
           </div>
-          {event.isDone && (
-            <div className="bg-black flex-grow p-6">
-              <p
-                className={`text-white text-base transition-opacity duration-300`}
-              >
-                {event.description}
-              </p>
-            </div>
-          )}
+          {event.isDone ||
+            (event.isDisabled && (
+              <div className="bg-black flex-grow p-6">
+                <p
+                  className={`text-white text-base transition-opacity duration-300`}
+                >
+                  {event.description}
+                </p>
+              </div>
+            ))}
         </div>
       </div>
       <div className="py-4 px-2">

@@ -14,6 +14,7 @@ export interface Event {
   description: string;
   options: Option[];
   isDone?: boolean;
+  isDisabled?: boolean;
   music_file: string;
 }
 
