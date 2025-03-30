@@ -16,7 +16,6 @@ export const Slider = ({ events }: { events: Event[] }) => {
     }[]
   >([]);
   const [cards, setCards] = useState<Event[]>(events);
-  const [currentBgAudio, setCurrentBgAudio] = useState<number>(1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [audioInitialized, setAudioInitialized] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(true);
@@ -34,9 +33,7 @@ export const Slider = ({ events }: { events: Event[] }) => {
     if (audioInitialized) {
       if (!selectedCard) {
         if (!audioRef.current) {
-          audioRef.current = new Audio(
-            `/music-bg/background_${currentBgAudio}.mp3`
-          );
+          audioRef.current = new Audio(`/music-bg/background_1.mp3`);
           audioRef.current.loop = true;
         }
 
@@ -55,7 +52,7 @@ export const Slider = ({ events }: { events: Event[] }) => {
         audioRef.current.pause();
       }
     };
-  }, [selectedCard, currentBgAudio, audioInitialized, isMuted]);
+  }, [selectedCard, audioInitialized, isMuted]);
 
   // Initialize audio on first user interaction
   const initializeAudio = () => {
@@ -66,18 +63,7 @@ export const Slider = ({ events }: { events: Event[] }) => {
 
   // Change audio file when card is closed
   const handleCloseCard = () => {
-    const newAudioNumber = Math.floor(Math.random() * 8) + 1;
-    setCurrentBgAudio(newAudioNumber);
     setSelectedCard(null);
-
-    if (audioRef.current && audioInitialized) {
-      audioRef.current.src = `/audio-bg/background_${newAudioNumber}.mp3`;
-      if (!isMuted) {
-        audioRef.current
-          .play()
-          .catch((err) => console.error("Error playing audio:", err));
-      }
-    }
   };
 
   // Toggle mute
@@ -283,7 +269,7 @@ export const Slider = ({ events }: { events: Event[] }) => {
             position: "fixed",
             top: "8px",
             right: "8px",
-            zIndex: 1000,
+            zIndex: 1,
             background: "rgba(0,0,0,0.7)",
             color: "white",
             border: "none",
