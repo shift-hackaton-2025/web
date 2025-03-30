@@ -23,15 +23,17 @@ interface UpdateEventsPayload {
   temperature: number;
 }
 
-export const updateEvents = async (
-  payload: UpdateEventsPayload
-): Promise<{
+export interface UpdateEventsResult {
   events: Event[];
   image_tasks: {
     event_id: string;
     task_id: string;
   }[];
-}> => {
+}
+
+export const updateEvents = async (
+  payload: UpdateEventsPayload
+): Promise<UpdateEventsResult> => {
   try {
     const response = await fetch(`${API_URL}/update_events`, {
       method: "POST",

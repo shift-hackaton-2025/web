@@ -6,8 +6,8 @@ interface ModalProps {
   date: string;
   content: string;
   options: Event["options"];
-  onSelectOption: (optionIndex: number) => void;
   onClose: () => void;
+  onSelectOption: (optionIndex: number) => void;
 }
 
 export const Path = ({
@@ -15,11 +15,10 @@ export const Path = ({
   date,
   content,
   options = [],
-  onSelectOption,
   onClose,
+  onSelectOption,
 }: ModalProps) => {
   const year = date.split("-")[0];
-  console.log("options: ", options);
 
   return (
     <motion.div

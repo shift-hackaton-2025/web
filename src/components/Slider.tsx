@@ -5,7 +5,7 @@ import SliderItem from "./SliderItem";
 import styles from "./slider.module.css";
 import { Modal } from "./Modal";
 import { Event } from "@/types/events";
-import { updateEvents } from "@/services/api";
+import { updateEvents, type UpdateEventsResult } from "@/services/api";
 
 export const Slider = ({ events }: { events: Event[] }) => {
   const [selectedCard, setSelectedCard] = useState<Event | null>(null);
@@ -16,6 +16,9 @@ export const Slider = ({ events }: { events: Event[] }) => {
     }[]
   >([]);
   const [cards, setCards] = useState<Event[]>(events);
+  const [generatedResults, setGeneratedResults] = useState<
+    UpdateEventsResult[]
+  >([]);
 
   const sliderRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -119,18 +122,12 @@ export const Slider = ({ events }: { events: Event[] }) => {
     };
   }, [isDragging, startX, startY, scrollLeft, scrollTop]);
 
-  const onCreateNewEvent = async (optionIndex: number) => {
+  const onSelectOption = async (optionIndex: number) => {
     if (!selectedCard) return;
 
-    try {
-      const optionChosen = `${selectedCard.id}_${optionIndex}`;
-      const response = await updateEvents({
-        events: cards,
-        option_chosen: optionChosen,
-        model: "gpt-4o",
-        temperature: 0.7,
-      });
+    const selectedResult = generatedResults[optionIndex];
 
+    try {
       // Find the index of the current card
       const currentCardIndex = cards.findIndex(
         (card) => card.id === selectedCard.id
@@ -147,24 +144,44 @@ export const Slider = ({ events }: { events: Event[] }) => {
 
       const newCards = [
         ...updatedCards.slice(0, currentCardIndex + 1),
-        ...response.events,
+        ...selectedResult.events,
       ];
 
-      console.log("newCards: ", newCards);
-      console.log("response.image_tasks: ", response.image_tasks);
-
       setCards(newCards);
-      console.log(
-        "setImageTasks: ",
-        response.image_tasks.filter((task) => task.event_id !== selectedCard.id)
-      );
       setImageTasks(
-        response.image_tasks.filter((task) => task.event_id !== selectedCard.id)
+        selectedResult.image_tasks.filter(
+          (task) => task.event_id !== selectedCard.id
+        )
       );
     } catch (error) {
       console.error("Error updating events:", error);
     }
   };
+
+  const generateResults = async () => {
+    if (!selectedCard) return;
+
+    try {
+      const promises = selectedCard.options.map((option, index) => {
+        const optionChosen = `${selectedCard.id}_${index}`;
+        return updateEvents({
+          events: cards,
+          option_chosen: optionChosen,
+          model: "gpt-4o",
+          temperature: 0.7,
+        });
+      });
+
+      const results = await Promise.all(promises);
+      setGeneratedResults(results);
+    } catch (error) {
+      console.error("Error updating events:", error);
+    }
+  };
+
+  useEffect(() => {
+    generateResults();
+  }, [selectedCard]);
 
   return (
     <>
@@ -199,8 +216,9 @@ export const Slider = ({ events }: { events: Event[] }) => {
           title={selectedCard.title}
           date={selectedCard.date}
           content={selectedCard.description}
+          generatedResults={generatedResults}
           onClose={() => setSelectedCard(null)}
-          onCreateNewEvent={onCreateNewEvent}
+          onFinish={onSelectOption}
           options={selectedCard.options}
         />
       )}
