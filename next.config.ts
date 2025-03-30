@@ -4,7 +4,8 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        hostname: "picsum.photos",
+        hostname:
+          "uchronianh-g4bxcccwbqf8dmhe.francecentral-01.azurewebsites.net",
       },
     ],
   },

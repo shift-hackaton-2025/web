@@ -5,19 +5,14 @@ import { useState } from "react";
 import { Settings, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import clsx from "clsx";
+import { Event } from "@/types/events";
 
 interface SliderItemProps {
-  event: {
-    id: string;
-    title: string;
-    date: string;
-    imageUrl: string;
-    content: string;
-    isDone?: boolean;
-  };
+  event: Event;
+  onClick: () => void;
 }
 
-const SliderItem = ({ event }: SliderItemProps) => {
+const SliderItem = ({ event, onClick }: SliderItemProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -34,7 +29,10 @@ const SliderItem = ({ event }: SliderItemProps) => {
   };
 
   return (
-    <div className="flex flex-col h-full w-[350px] rounded-lg overflow-hidden transition-transform duration-300 ease-in-out py-4 px-1">
+    <div
+      className="flex flex-col h-full w-[350px] rounded-lg overflow-hidden transition-transform duration-300 ease-in-out py-4 px-1"
+      {...(!event.isDone && { onClick })}
+    >
       <div className="p-4">
         <div className="flex items-center justify-center">
           <div className="w-0 h-0 border-t-[22px] border-t-transparent border-b-[22px] border-b-transparent border-r-[16px] border-r-white" />
@@ -52,7 +50,7 @@ const SliderItem = ({ event }: SliderItemProps) => {
           }`}
         >
           <Image
-            src={event.imageUrl}
+            src={`https://uchronianh-g4bxcccwbqf8dmhe.francecentral-01.azurewebsites.net/${event.image}`}
             alt={event.title}
             fill
             sizes="342px"

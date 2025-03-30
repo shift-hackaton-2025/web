@@ -10,8 +10,10 @@ export interface Event {
   title: string;
   image: string;
   date: string;
+  content: string;
   options: Option[];
   disabled?: boolean;
+  isDone?: boolean;
 }
 
 export type Events = Event[];

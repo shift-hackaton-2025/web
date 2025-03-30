@@ -1,11 +1,16 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { events } from "@/mock/events";
 import SliderItem from "./SliderItem";
 import styles from "./slider.module.css";
+import { Modal } from "./Modal";
+import { Event } from "@/types/events";
+import { updateEvents } from "@/services/api";
 
-export const Slider = () => {
+export const Slider = ({ events }: { events: Event[] }) => {
+  const [selectedCard, setSelectedCard] = useState<Event | null>(null);
+  const [cards, setCards] = useState<Event[]>(events);
+
   const sliderRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -108,23 +113,78 @@ export const Slider = () => {
     };
   }, [isDragging, startX, startY, scrollLeft, scrollTop]);
 
+  const onCreateNewEvent = async (optionIndex: number) => {
+    if (!selectedCard) return;
+
+    try {
+      const optionChosen = `${selectedCard.id}_${optionIndex}`;
+      const response = await updateEvents({
+        events: cards,
+        option_chosen: optionChosen,
+        model: "gpt-4o",
+        temperature: 0.7,
+      });
+
+      // Find the index of the current card
+      const currentCardIndex = cards.findIndex(
+        (card) => card.id === selectedCard.id
+      );
+
+      // Update the selected card's image with the chosen option's image
+      const updatedCards = [...cards];
+      updatedCards[currentCardIndex] = {
+        ...updatedCards[currentCardIndex],
+        image: selectedCard.options[optionIndex].option_img_link,
+        disabled: true,
+      };
+
+      const newCards = [
+        ...updatedCards.slice(0, currentCardIndex + 1),
+        ...response,
+      ];
+
+      setCards(newCards);
+      setSelectedCard(null);
+    } catch (error) {
+      console.error("Error updating events:", error);
+    }
+  };
+
+  console.log("cards: ", cards);
+
   return (
-    <div className={styles.sliderWrapper}>
-      <div
-        ref={sliderRef}
-        className={`${styles.slider} ${styles.scrollContainer} ${
-          isDragging ? "cursor-grabbing" : "cursor-grab"
-        }`}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
-        style={{
-          overscrollBehavior: "contain",
-        }}
-      >
-        {events.map((event) => (
-          <SliderItem key={event.id} event={event} />
-        ))}
+    <>
+      <div className={styles.sliderWrapper}>
+        <div
+          ref={sliderRef}
+          className={`${styles.slider} ${styles.scrollContainer} ${
+            isDragging ? "cursor-grabbing" : "cursor-grab"
+          }`}
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+          style={{
+            overscrollBehavior: "contain",
+          }}
+        >
+          {cards.map((card) => (
+            <SliderItem
+              key={card.id}
+              event={card}
+              onClick={() => setSelectedCard(card)}
+            />
+          ))}
+        </div>
       </div>
-    </div>
+      {selectedCard && (
+        <Modal
+          title={selectedCard.title}
+          date={selectedCard.date}
+          content={selectedCard.content}
+          onClose={() => setSelectedCard(null)}
+          onCreateNewEvent={onCreateNewEvent}
+          options={selectedCard.options}
+        />
+      )}
+    </>
   );
 };
