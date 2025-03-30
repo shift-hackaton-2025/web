@@ -147,8 +147,8 @@ export const Modal = ({
                         )})`,
                       }}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-                      <div className="absolute bottom-10 left-0 right-0 p-8 text-white/90 text-xl max-w-[50%] mx-auto">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent" />
+                      <div className="absolute bottom-[12%] left-0 right-0 p-8 text-white/90 text-xl max-w-[50%] mx-auto">
                         <p className="pt-6 text-3xl font-bold mb-2">{year}</p>
                         <h2 className="text-4xl font-bold mb-6">
                           {options[selectedOption].title}
@@ -159,8 +159,8 @@ export const Modal = ({
                         <button
                           {...(!loading && { onClick: onClose })}
                           className={cn(
-                            "text-white border border-white rounded-full px-6 py-2 transition-colors cursor-pointer text-basehover:text-black",
-                            { "hover:bg-white": !loading }
+                            "text-white border border-white rounded-full px-6 py-2 transition-colors cursor-pointer text-base",
+                            { "hover:bg-white hover:text-black": !loading }
                           )}
                         >
                           {loading
