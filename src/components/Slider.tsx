@@ -141,7 +141,7 @@ export const Slider = ({ events }: { events: Event[] }) => {
       updatedCards[currentCardIndex] = {
         ...updatedCards[currentCardIndex],
         title: selectedCard.options[optionIndex].title,
-        image: selectedCard.options[optionIndex].option_img_link,
+        image: selectedCard.options[optionIndex].img,
         isDone: true,
       };
 

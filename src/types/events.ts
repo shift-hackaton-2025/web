@@ -1,6 +1,6 @@
 export interface Option {
   title: string;
-  option_img_link: string;
+  img: string;
   consequence: string;
   consequence_img_link: string;
 }
