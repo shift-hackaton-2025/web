@@ -13,6 +13,7 @@
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.8.1",
     "clsx": "^2.1.1",
+    "cross-fetch": "^4.1.0",
     "framer-motion": "^12.6.2",
     "lucide-react": "^0.485.0",
     "motion": "^12.6.2",

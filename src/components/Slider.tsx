@@ -145,10 +145,14 @@ export const Slider = ({ events }: { events: Event[] }) => {
         isDone: true,
       };
 
+      console.log("response.events: ", response.events);
+
       const newCards = [
         ...updatedCards.slice(0, currentCardIndex + 1),
         ...response.events,
       ];
+
+      console.log("newCards: ", newCards);
 
       setCards(newCards);
       setImageTasks(
@@ -158,6 +162,8 @@ export const Slider = ({ events }: { events: Event[] }) => {
       console.error("Error updating events:", error);
     }
   };
+
+  console.log("imageTasks: ", imageTasks);
 
   return (
     <>

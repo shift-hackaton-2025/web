@@ -6,6 +6,8 @@ import { Settings, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import clsx from "clsx";
 import { Event } from "@/types/events";
+import fetch from "cross-fetch";
+import { getImagePath } from "@/lib/img";
 
 interface SliderItemProps {
   event: Event;
@@ -35,11 +37,15 @@ const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
 
       try {
         const response = await fetch(
-          `https://uchronia-backend.deploymate.xyz/image-status/${imageTask.task_id}`
+          `https://uchronia-backend.deploymate.xyz/image-status/${imageTask.task_id}`,
+          {
+            method: "GET",
+            cache: "no-store",
+            keepalive: false,
+            headers: { "Cache-Control": "no-cache" },
+          }
         );
         const data = await response.json();
-
-        console.log("imageTask: ", data);
 
         if (data.status === "completed" && data.image_url) {
           setImageUrl(data.image_url);
@@ -53,7 +59,9 @@ const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
 
     if (imageTask?.task_id) {
       // Initial call
-      pollImageStatus();
+      setTimeout(() => {
+        pollImageStatus();
+      }, 2000);
 
       // Set up polling interval (every 5 seconds)
       intervalId = setInterval(pollImageStatus, 10000);
@@ -76,8 +84,6 @@ const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
       return dateString; // Fallback to the original string if parsing fails
     }
   };
-
-  console.log("imageUrl: ", imageUrl);
 
   return (
     <div
@@ -104,9 +110,7 @@ const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
             <Image
               key={imageUrl || event.image}
               src={
-                imageUrl
-                  ? `https://uchronia-backend.deploymate.xyz${imageUrl}`
-                  : `https://uchronia-backend.deploymate.xyz/${event.image}`
+                imageUrl ? getImagePath(imageUrl) : getImagePath(event.image)
               }
               alt={event.title}
               fill

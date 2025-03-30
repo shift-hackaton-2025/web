@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Event } from "@/types/events";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { getImagePath } from "@/lib/img";
 
 interface ModalProps {
   title: string;
@@ -44,6 +45,11 @@ export const Modal = ({
   console.log(
     "options[selectedOption]: ",
     typeof selectedOption === "number" && options[selectedOption].music_file
+  );
+
+  console.log(
+    "getImagePath: ",
+    selectedOption && getImagePath(options[selectedOption].img)
   );
 
   return (
@@ -100,7 +106,7 @@ export const Modal = ({
                   <div
                     className="absolute inset-0 bg-cover bg-center"
                     style={{
-                      backgroundImage: `url(https://uchronia-backend.deploymate.xyz/${option.img})`,
+                      backgroundImage: `url(${getImagePath(option.img)})`,
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
@@ -136,7 +142,9 @@ export const Modal = ({
                     <div
                       className="flex-1 bg-cover bg-center relative"
                       style={{
-                        backgroundImage: `url(https://uchronia-backend.deploymate.xyz/${options[selectedOption].img})`,
+                        backgroundImage: `url(${getImagePath(
+                          options[selectedOption].img
+                        )})`,
                       }}
                     >
                       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
