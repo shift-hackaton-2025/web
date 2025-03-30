@@ -3,6 +3,7 @@ import { Event } from "@/types/events";
 const API_URL = "https://uchronia-backend.deploymate.xyz";
 
 export const fetchInitialEvents = async (): Promise<Event[]> => {
+
   try {
     const response = await fetch(`${API_URL}/get_initial_events`);
     if (!response.ok) {

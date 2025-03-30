@@ -6,6 +6,7 @@ import styles from "./slider.module.css";
 import { Modal } from "./Modal";
 import { Event } from "@/types/events";
 import { updateEvents } from "@/services/api";
+import { json } from "stream/consumers";
 
 export const Slider = ({ events }: { events: Event[] }) => {
   const [selectedCard, setSelectedCard] = useState<Event | null>(null);
@@ -191,6 +192,120 @@ export const Slider = ({ events }: { events: Event[] }) => {
               onClick={() => setSelectedCard(card)}
             />
           ))}
+          <SliderItem
+            key="exit-card"
+            event={{
+              id: "exit",
+              title: "Exit Story",
+              description: "Click here to exit the story",
+              date: " ",
+              image: "data/images_default/exit_image.png",
+              isDone: false,
+              options: []
+            }}
+            onClick={async () => {
+              try {                
+                const eventsToSend = cards.filter(card => card.id !== "exit");
+                // Filter out any non-event cards and map to the required format
+                const formattedEvents = eventsToSend.map(card => ({
+                  id: card.id || "",
+                  title: card.title || "",
+                  description: card.description || "",
+                  image: card.image || "",
+                  date: card.date || "",
+                  music_file: card.music_file || "",
+                  options: Array.isArray(card.options) ? card.options.map(option => ({
+                    title: option.title || "",
+                    consequence: Array.isArray(option.consequence) ? option.consequence : ["", "", ""],
+                    img: option.img || "",
+                    music_file: option.music_file || ""
+                  })) : []
+                }));
+                  
+                // Create and show loading element
+                const loaderElement = document.createElement('div');
+                loaderElement.className = 'fixed inset-0 bg-black/90 backdrop-blur z-50 flex items-center justify-center';
+                loaderElement.innerHTML = `
+                  <div class="flex flex-col items-center">
+                    <div class="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <p class="text-white mt-4">Generating your story summary...</p>
+                  </div>
+                `;
+                document.body.appendChild(loaderElement);
+
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", `https://uchronia-backend.deploymate.xyz/exit_game`, true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                console.log("eventsToSend: ", formattedEvents);
+                xhr.send(JSON.stringify({ formattedEvents }));
+                xhr.onreadystatechange = function() {
+                  if (xhr.readyState === 4) {
+                    // Remove loader
+                    document.body.removeChild(loaderElement);
+                    console.log("xhr.status: ", xhr.status);
+                    if (xhr.status === 200) {
+                      console.log("Success:", xhr.responseText);
+                      const { description: summary } = JSON.parse(xhr.responseText);
+                      console.log("Generation de la synthèse du jeu:", summary);
+                      // Show the summary modal
+                      const summaryElement = document.createElement('div');
+                      summaryElement.className = 'fixed inset-0 bg-black/90 backdrop-blur z-50 flex items-center justify-center';
+                      
+                      const content = `
+                        <div class="bg-white/10 p-8 rounded-lg max-w-2xl w-full mx-4">
+                          <h2 class="text-3xl font-bold text-white mb-6">Fin du jeu</h2>
+                          <div class="prose prose-lg text-white mb-8">
+                            <p>${"Merci d'avoir joué!"}</p>
+                          </div>
+                          <div class="flex justify-center">
+                            <button 
+                              class="bg-white text-black px-6 py-2 rounded-full hover:bg-gray-200 transition-colors"
+                              onclick="window.location.reload()"
+                            >
+                              Rejouer
+                            </button>
+                          </div>
+                        </div>
+                      `;
+                      
+                      summaryElement.innerHTML = content;
+                      document.body.appendChild(summaryElement);
+                    } else {
+                      console.error("Error status:", xhr.status);
+                      console.error("Response:", xhr.responseText);
+                      
+                      const summaryElement = document.createElement('div');
+                      summaryElement.className = 'fixed inset-0 bg-black/90 backdrop-blur z-50 flex items-center justify-center';
+                      
+                      const content = `
+                        <div class="bg-white/10 p-8 rounded-lg max-w-2xl w-full mx-4">
+                          <h2 class="text-3xl font-bold text-white mb-6">Fin du jeu</h2>
+                          <div class="prose prose-lg text-white mb-8">
+                            <p>${ "Thank you for playing!"}</p>
+                          </div>
+                          <div class="flex justify-center">
+                            <button 
+                              class="bg-white text-black px-6 py-2 rounded-full hover:bg-gray-200 transition-colors"
+                              onclick="window.location.reload()"
+                            >
+                              Rejouer
+                            </button>
+                          </div>
+                        </div>
+                      `;
+
+                      summaryElement.innerHTML = content;
+                      document.body.appendChild(summaryElement);
+                    }
+                  }
+                };
+                
+              } catch (error) {
+                console.error("Error in exit game function:", error);
+
+              }
+            }}
+          />
         </div>
       </div>
       {selectedCard && (

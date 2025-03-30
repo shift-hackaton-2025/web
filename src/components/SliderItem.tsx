@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Settings, ChevronUp } from "lucide-react";
+import { MousePointerClick, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import clsx from "clsx";
 import { Event } from "@/types/events";
@@ -18,13 +18,15 @@ interface SliderItemProps {
         task_id: string;
       }
     | undefined;
+  isPast?: boolean;
 }
 
-const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
+const SliderItem = ({ event, onClick, imageTask, isPast = false }: SliderItemProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isPolling, setIsPolling] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
     console.log("task_id: ", imageTask?.task_id);
@@ -89,8 +91,12 @@ const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
 
   return (
     <div
-      className="flex flex-col h-full w-[350px] rounded-lg overflow-hidden transition-transform duration-300 ease-in-out py-4 px-1"
-      {...(!event.isDone && { onClick })}
+      className={`flex flex-col h-full w-[350px] rounded-lg overflow-hidden transition-transform duration-300 ease-in-out py-4 px-1 ${
+        isPast ? 'opacity-60 pointer-events-none filter blur-[2px]' : ''
+      }`}
+      {...(!event.isDone && !isPast && { onClick })}
+      onMouseEnter={() => !isPast && setIsHovering(true)}
+      onMouseLeave={() => !isPast && setIsHovering(false)}
     >
       <div className="p-4">
         <div className="flex items-center justify-center">
@@ -115,7 +121,9 @@ const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
               alt={event.title}
               fill
               sizes="342px"
-              className="object-cover transition-transform duration-500 ease-in-out"
+              className={`object-cover transition-transform duration-500 ease-in-out ${
+                isHovering ? "scale-120" : "scale-100"
+              }`}
               onLoad={() => setImageLoaded(true)}
               loading="lazy"
               unoptimized
@@ -156,7 +164,7 @@ const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
               {event.isDone ? (
                 <ChevronUp className="text-white bg-black w-6 h-6 transition-transform group-hover:rotate-180  duration-300" />
               ) : (
-                <Settings className="text-white bg-black w-6 h-6 transition-transform group-hover:rotate-90 duration-300" />
+                <MousePointerClick className="text-white bg-black w-6 h-6 transition-transform group-hover:rotate-90 duration-300" />
               )}
             </div>
             <div
