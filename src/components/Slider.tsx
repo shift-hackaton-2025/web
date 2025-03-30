@@ -16,6 +16,10 @@ export const Slider = ({ events }: { events: Event[] }) => {
     }[]
   >([]);
   const [cards, setCards] = useState<Event[]>(events);
+  const [currentBgAudio, setCurrentBgAudio] = useState<number>(1);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [audioInitialized, setAudioInitialized] = useState<boolean>(false);
+  const [isMuted, setIsMuted] = useState<boolean>(true);
 
   const sliderRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -24,8 +28,80 @@ export const Slider = ({ events }: { events: Event[] }) => {
   const [scrollLeft, setScrollLeft] = useState(0);
   const [scrollTop, setScrollTop] = useState(0);
 
+  // Handle background audio
+  useEffect(() => {
+    // Only attempt to play if we've had user interaction
+    if (audioInitialized) {
+      if (!selectedCard) {
+        if (!audioRef.current) {
+          audioRef.current = new Audio(
+            `/music-bg/background_${currentBgAudio}.mp3`
+          );
+          audioRef.current.loop = true;
+        }
+
+        if (!isMuted) {
+          audioRef.current
+            .play()
+            .catch((err) => console.error("Error playing audio:", err));
+        }
+      } else if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    }
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, [selectedCard, currentBgAudio, audioInitialized, isMuted]);
+
+  // Initialize audio on first user interaction
+  const initializeAudio = () => {
+    if (!audioInitialized) {
+      setAudioInitialized(true);
+    }
+  };
+
+  // Change audio file when card is closed
+  const handleCloseCard = () => {
+    const newAudioNumber = Math.floor(Math.random() * 8) + 1;
+    setCurrentBgAudio(newAudioNumber);
+    setSelectedCard(null);
+
+    if (audioRef.current && audioInitialized) {
+      audioRef.current.src = `/audio-bg/background_${newAudioNumber}.mp3`;
+      if (!isMuted) {
+        audioRef.current
+          .play()
+          .catch((err) => console.error("Error playing audio:", err));
+      }
+    }
+  };
+
+  // Toggle mute
+  const toggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering other click handlers
+    setIsMuted(!isMuted);
+    if (audioRef.current) {
+      if (isMuted) {
+        audioRef.current
+          .play()
+          .catch((err) => console.error("Error playing audio:", err));
+      } else {
+        audioRef.current.pause();
+      }
+    }
+    // Initialize audio if this is the first interaction
+    if (!audioInitialized) {
+      setAudioInitialized(true);
+    }
+  };
+
   // Handle mouse down event for dragging
   const handleMouseDown = (e: React.MouseEvent) => {
+    initializeAudio();
     setIsDragging(true);
     setStartX(e.pageX - (sliderRef.current?.offsetLeft || 0));
     setStartY(e.pageY - (sliderRef.current?.offsetTop || 0));
@@ -66,6 +142,7 @@ export const Slider = ({ events }: { events: Event[] }) => {
 
   // Touch event handlers
   const handleTouchStart = (e: React.TouchEvent) => {
+    initializeAudio();
     if (e.touches.length === 1) {
       setIsDragging(true);
       setStartX(e.touches[0].clientX - (sliderRef.current?.offsetLeft || 0));
@@ -192,17 +269,42 @@ export const Slider = ({ events }: { events: Event[] }) => {
                 console.log("card.id: ", card.id);
                 return task.event_id === card.id;
               })}
-              onClick={() => setSelectedCard(card)}
+              onClick={() => {
+                initializeAudio();
+                setSelectedCard(card);
+              }}
             />
           ))}
         </div>
+
+        <button
+          onClick={toggleMute}
+          style={{
+            position: "fixed",
+            top: "8px",
+            right: "8px",
+            zIndex: 1000,
+            background: "rgba(0,0,0,0.7)",
+            color: "white",
+            border: "none",
+            borderRadius: "50%",
+            width: "40px",
+            height: "40px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            cursor: "pointer",
+          }}
+        >
+          {isMuted ? "🔇" : "🔊"}
+        </button>
       </div>
       {selectedCard && (
         <Modal
           title={selectedCard.title}
           date={selectedCard.date}
           content={selectedCard.description}
-          onClose={() => setSelectedCard(null)}
+          onClose={handleCloseCard}
           onCreateNewEvent={onCreateNewEvent}
           options={selectedCard.options}
           music_file={selectedCard.music_file}
