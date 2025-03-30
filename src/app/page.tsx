@@ -7,7 +7,6 @@ async function EventsLoader() {
   const sortedEvents = [...data].sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
-  console.log(sortedEvents);
   return <Slider events={sortedEvents} />;
 }
 

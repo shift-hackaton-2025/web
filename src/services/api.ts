@@ -28,7 +28,8 @@ export const updateEvents = async (
 ): Promise<{
   events: Event[];
   image_tasks: {
-    additionalProp1: string;
+    event_id: string;
+    task_id: string;
   }[];
 }> => {
   try {
@@ -39,8 +40,6 @@ export const updateEvents = async (
       },
       body: JSON.stringify(payload),
     });
-
-    console.log(response);
 
     if (!response.ok) {
       throw new Error("Failed to update events");

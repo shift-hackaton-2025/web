@@ -11,7 +11,8 @@ export const Slider = ({ events }: { events: Event[] }) => {
   const [selectedCard, setSelectedCard] = useState<Event | null>(null);
   const [imageTasks, setImageTasks] = useState<
     {
-      additionalProp1: string;
+      event_id: string;
+      task_id: string;
     }[]
   >([]);
   const [cards, setCards] = useState<Event[]>(events);
@@ -139,8 +140,9 @@ export const Slider = ({ events }: { events: Event[] }) => {
       const updatedCards = [...cards];
       updatedCards[currentCardIndex] = {
         ...updatedCards[currentCardIndex],
+        title: selectedCard.options[optionIndex].title,
         image: selectedCard.options[optionIndex].option_img_link,
-        disabled: true,
+        isDone: true,
       };
 
       const newCards = [
@@ -148,15 +150,21 @@ export const Slider = ({ events }: { events: Event[] }) => {
         ...response.events,
       ];
 
+      console.log("newCards: ", newCards);
+      console.log("response.image_tasks: ", response.image_tasks);
+
       setCards(newCards);
-      setImageTasks(response.image_tasks);
-      setSelectedCard(null);
+      console.log(
+        "setImageTasks: ",
+        response.image_tasks.filter((task) => task.event_id !== selectedCard.id)
+      );
+      setImageTasks(
+        response.image_tasks.filter((task) => task.event_id !== selectedCard.id)
+      );
     } catch (error) {
       console.error("Error updating events:", error);
     }
   };
-
-  console.log("cards: ", cards);
 
   return (
     <>
@@ -176,6 +184,11 @@ export const Slider = ({ events }: { events: Event[] }) => {
             <SliderItem
               key={card.id}
               event={card}
+              imageTask={imageTasks.find((task) => {
+                console.log("task.event_id: ", task.event_id);
+                console.log("card.id: ", card.id);
+                return task.event_id === card.id;
+              })}
               onClick={() => setSelectedCard(card)}
             />
           ))}

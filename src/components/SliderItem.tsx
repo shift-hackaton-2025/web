@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Settings, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import clsx from "clsx";
@@ -10,11 +10,60 @@ import { Event } from "@/types/events";
 interface SliderItemProps {
   event: Event;
   onClick: () => void;
+  imageTask?:
+    | {
+        event_id: string;
+        task_id: string;
+      }
+    | undefined;
 }
 
-const SliderItem = ({ event, onClick }: SliderItemProps) => {
+const SliderItem = ({ event, onClick, imageTask }: SliderItemProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isPolling, setIsPolling] = useState(false);
+
+  useEffect(() => {
+    console.log("task_id: ", imageTask?.task_id);
+    let intervalId: NodeJS.Timeout;
+
+    const pollImageStatus = async () => {
+      if (!imageTask?.task_id || isPolling) return;
+
+      setIsPolling(true);
+
+      try {
+        const response = await fetch(
+          `https://uchronianh-g4bxcccwbqf8dmhe.francecentral-01.azurewebsites.net/image-status/${imageTask.task_id}`
+        );
+        const data = await response.json();
+
+        console.log("imageTask: ", data);
+
+        if (data.status === "completed" && data.image_url) {
+          setImageUrl(data.image_url);
+          clearInterval(intervalId);
+          setIsPolling(false);
+        }
+      } catch (error) {
+        console.error("Error polling image status:", error);
+      }
+    };
+
+    if (imageTask?.task_id) {
+      // Initial call
+      pollImageStatus();
+
+      // Set up polling interval (every 5 seconds)
+      intervalId = setInterval(pollImageStatus, 5000);
+    }
+
+    // Clean up interval on component unmount
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [imageTask]);
 
   // Format date to be more readable
   const formatDate = (dateString: string) => {
@@ -49,15 +98,22 @@ const SliderItem = ({ event, onClick }: SliderItemProps) => {
             imageLoaded ? "opacity-100 scale-100" : "opacity-0 scale-110"
           }`}
         >
-          <Image
-            src={`https://uchronianh-g4bxcccwbqf8dmhe.francecentral-01.azurewebsites.net/${event.image}`}
-            alt={event.title}
-            fill
-            sizes="342px"
-            className="object-cover transition-transform duration-500 ease-in-out"
-            onLoad={() => setImageLoaded(true)}
-            loading="lazy"
-          />
+          {(event.image || imageUrl) && (
+            <Image
+              key={event.image || imageUrl}
+              src={
+                event.image
+                  ? `https://uchronianh-g4bxcccwbqf8dmhe.francecentral-01.azurewebsites.net/${event.image}`
+                  : `https://uchronianh-g4bxcccwbqf8dmhe.francecentral-01.azurewebsites.net/${imageUrl}`
+              }
+              alt={event.title}
+              fill
+              sizes="342px"
+              className="object-cover transition-transform duration-500 ease-in-out"
+              onLoad={() => setImageLoaded(true)}
+              loading="lazy"
+            />
+          )}
         </div>
         <div
           className={cn(
@@ -114,7 +170,7 @@ const SliderItem = ({ event, onClick }: SliderItemProps) => {
       <div className="py-4 px-2">
         <div className="flex items-center justify-center">
           <div className="w-0 h-0 border-t-[36px] border-t-transparent border-b-[36px] border-b-transparent border-r-[22px] border-r-white" />
-          <h3 className="text-xl font-bold text-black bg-white text-center px-9 py-2 line-clamp-2 overflow-hidden">
+          <h3 className="text-l font-bold text-black bg-white text-center px-9 py-2 overflow-hidden min-h-[72px] flex items-center justify-center">
             {event.title}
           </h3>
           <div className="w-0 h-0 border-t-[36px] border-t-transparent border-b-[36px] border-b-transparent border-l-[22px] border-white" />

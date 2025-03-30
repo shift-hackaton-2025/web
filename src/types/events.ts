@@ -12,7 +12,6 @@ export interface Event {
   date: string;
   description: string;
   options: Option[];
-  disabled?: boolean;
   isDone?: boolean;
 }
 
